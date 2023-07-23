@@ -5,17 +5,7 @@ using System.Collections.Generic;
 namespace KartGame.KartSystems
 {
     public class ArcadeKart : MonoBehaviour
-    {
-        /*
-        [System.Serializable]
-        public class StatPowerup
-        {
-            public ArcadeKart.Stats modifiers;
-            public string PowerUpID;
-            public float ElapsedTime;
-            public float MaxTime;
-        }*/
-
+    {        
         [System.Serializable]
         public struct Stats
         {
@@ -72,7 +62,6 @@ namespace KartGame.KartSystems
         }
 
         public Rigidbody Rigidbody { get; private set; }
-        //public InputData CurrentInput     { get; private set; }
         public float AirPercent    { get; private set; }
         public float GroundPercent { get; private set; }
 
@@ -89,6 +78,11 @@ namespace KartGame.KartSystems
             Grip                = .95f,
             AddedGravity        = 1f,
         };
+
+        public bool accelerate;
+        public bool brake;
+        public float Turn;
+
 
         [Header("Vehicle Visual")] 
         public List<GameObject> m_VisualWheels;
@@ -114,26 +108,6 @@ namespace KartGame.KartSystems
         [Range(0.0f, 20.0f), Tooltip("The lower the value, the longer the drift will last without trying to control it by steering.")]
         public float DriftDampening = 10.0f;
 
-        /*
-        [Header("VFX")]
-        [Tooltip("VFX that will be placed on the wheels when drifting.")]
-        public ParticleSystem DriftSparkVFX;
-        [Range(0.0f, 0.2f), Tooltip("Offset to displace the VFX to the side.")]
-        public float DriftSparkHorizontalOffset = 0.1f;
-        [Range(0.0f, 90.0f), Tooltip("Angle to rotate the VFX.")]
-        public float DriftSparkRotation = 17.0f;
-        [Tooltip("VFX that will be placed on the wheels when drifting.")]
-        public GameObject DriftTrailPrefab;
-        [Range(-0.1f, 0.1f), Tooltip("Vertical to move the trails up or down and ensure they are above the ground.")]
-        public float DriftTrailVerticalOffset;
-        [Tooltip("VFX that will spawn upon landing, after a jump.")]
-        public GameObject JumpVFX;
-        [Tooltip("VFX that is spawn on the nozzles of the kart.")]
-        public GameObject NozzleVFX;
-        [Tooltip("List of the kart's nozzles.")]
-        public List<Transform> Nozzles;
-        */
-
         [Header("Suspensions")]
         [Tooltip("The maximum extension possible between the kart's body and the wheels.")]
         [Range(0.0f, 1.0f)]
@@ -155,10 +129,7 @@ namespace KartGame.KartSystems
 
         [Tooltip("Which layers the wheels will detect.")]
         public LayerMask GroundLayers = Physics.DefaultRaycastLayers;
-
-        // the input sources that can control the kart
-        //IInput[] m_Inputs;
-
+             
         const float k_NullInput = 0.01f;
         const float k_NullSpeed = 0.01f;
         Vector3 m_VerticalReference = Vector3.up;
@@ -169,16 +140,12 @@ namespace KartGame.KartSystems
         float m_CurrentGrip = 1.0f;
         float m_DriftTurningPower = 0.0f;
         float m_PreviousGroundPercent = 1.0f;
-        //readonly List<(GameObject trailRoot, WheelCollider wheel, TrailRenderer trail)> m_DriftTrailInstances = new List<(GameObject, WheelCollider, TrailRenderer)>();
-        //readonly List<(WheelCollider wheel, float horizontalOffset, float rotation, ParticleSystem sparks)> m_DriftSparkInstances = new List<(WheelCollider, float, float, ParticleSystem)>();
-
+        
         // can the kart move?
         bool m_CanMove = true;
-        //List<StatPowerup> m_ActivePowerupList = new List<StatPowerup>();
         ArcadeKart.Stats m_FinalStats;
 
         Quaternion m_LastValidRotation;
-        Vector3 m_LastValidPosition;
         Vector3 m_LastCollisionNormal;
         bool m_HasCollision;
         bool m_InAir = false;
@@ -186,46 +153,6 @@ namespace KartGame.KartSystems
         //public void AddPowerup(StatPowerup statPowerup) => m_ActivePowerupList.Add(statPowerup);
         public void SetCanMove(bool move) => m_CanMove = move;
         public float GetMaxSpeed() => Mathf.Max(m_FinalStats.TopSpeed, m_FinalStats.ReverseSpeed);
-
-        /*
-        private void ActivateDriftVFX(bool active)
-        {
-            foreach (var vfx in m_DriftSparkInstances)
-            {
-                if (active && vfx.wheel.GetGroundHit(out WheelHit hit))
-                {
-                    if (!vfx.sparks.isPlaying)
-                        vfx.sparks.Play();
-                }
-                else
-                {
-                    if (vfx.sparks.isPlaying)
-                        vfx.sparks.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-                }
-                    
-            }
-
-            foreach (var trail in m_DriftTrailInstances)
-                trail.Item3.emitting = active && trail.wheel.GetGroundHit(out WheelHit hit);
-        }
-        */
-
-        /*
-        private void UpdateDriftVFXOrientation()
-        {
-            foreach (var vfx in m_DriftSparkInstances)
-            {
-                vfx.sparks.transform.position = vfx.wheel.transform.position - (vfx.wheel.radius * Vector3.up) + (DriftTrailVerticalOffset * Vector3.up) + (transform.right * vfx.horizontalOffset);
-                vfx.sparks.transform.rotation = transform.rotation * Quaternion.Euler(0.0f, 0.0f, vfx.rotation);
-            }
-
-            foreach (var trail in m_DriftTrailInstances)
-            {
-                trail.trailRoot.transform.position = trail.wheel.transform.position - (trail.wheel.radius * Vector3.up) + (DriftTrailVerticalOffset * Vector3.up);
-                trail.trailRoot.transform.rotation = transform.rotation;
-            }
-        }
-        */
 
         void UpdateSuspensionParams(WheelCollider wheel)
         {
@@ -240,7 +167,6 @@ namespace KartGame.KartSystems
         void Awake()
         {
             Rigidbody = GetComponent<Rigidbody>();
-            //m_Inputs = GetComponents<IInput>();
 
             UpdateSuspensionParams(FrontLeftWheel);
             UpdateSuspensionParams(FrontRightWheel);
@@ -249,64 +175,17 @@ namespace KartGame.KartSystems
 
             m_CurrentGrip = baseStats.Grip;
 
-            /*
-            if (DriftSparkVFX != null)
-            {
-                AddSparkToWheel(RearLeftWheel, -DriftSparkHorizontalOffset, -DriftSparkRotation);
-                AddSparkToWheel(RearRightWheel, DriftSparkHorizontalOffset, DriftSparkRotation);
-            }
-
-            if (DriftTrailPrefab != null)
-            {
-                AddTrailToWheel(RearLeftWheel);
-                AddTrailToWheel(RearRightWheel);
-            }
-
-            if (NozzleVFX != null)
-            {
-                foreach (var nozzle in Nozzles)
-                {
-                    Instantiate(NozzleVFX, nozzle, false);
-                }
-            }
-            */
-
-            //TickPowerups();
-
             // add powerups to our final stats
             m_FinalStats = baseStats;
-
-            // clamp values in finalstats
-            //m_FinalStats.Grip = Mathf.Clamp(m_FinalStats.Grip, 0, 1);
         }
-
-        /*
-        void AddTrailToWheel(WheelCollider wheel)
-        {
-            GameObject trailRoot = Instantiate(DriftTrailPrefab, gameObject.transform, false);
-            TrailRenderer trail = trailRoot.GetComponentInChildren<TrailRenderer>();
-            trail.emitting = false;
-            m_DriftTrailInstances.Add((trailRoot, wheel, trail));
-        }
-
-        void AddSparkToWheel(WheelCollider wheel, float horizontalOffset, float rotation)
-        {
-            GameObject vfx = Instantiate(DriftSparkVFX.gameObject, wheel.transform, false);
-            ParticleSystem spark = vfx.GetComponent<ParticleSystem>();
-            spark.Stop();
-            m_DriftSparkInstances.Add((wheel, horizontalOffset, -rotation, spark));
-        }
-        */
-
-        private bool accelerate;
-        private bool brake;
-        public float turn;
+            
+        
 
         private void Update()
         {
-            accelerate = Input.GetButton("Accelerate");//Input.GetKeyDown(KeyCode.W);
-            brake = Input.GetButton("Brake");//Input.GetKeyDown(KeyCode.S);
-            turn = Input.GetAxis("Horizontal");
+            //accelerate = Input.GetButton("Accelerate");//Input.GetKeyDown(KeyCode.W);
+            //brake = Input.GetButton("Brake");//Input.GetKeyDown(KeyCode.S);
+            //Turn = Input.GetAxis("Horizontal");
         }
 
         void FixedUpdate()
@@ -317,13 +196,8 @@ namespace KartGame.KartSystems
             UpdateSuspensionParams(RearLeftWheel);
             UpdateSuspensionParams(RearRightWheel);
 
-            //GatherInputs();
-            
             WantsToDrift = false;
             WantsToDrift = brake && Vector3.Dot(Rigidbody.velocity, transform.forward) > 0.0f;
-
-            // apply our powerups to create our finalStats
-            //TickPowerups();
 
             // apply our physics properties
             Rigidbody.centerOfMass = transform.InverseTransformPoint(CenterOfMass.position);
@@ -347,7 +221,7 @@ namespace KartGame.KartSystems
             {
                 //MoveVehicle(CurrentInput.Accelerate, CurrentInput.Brake, CurrentInput.TurnInput);
                 //print(accelerate + " = "  + brake + " = " + turn);
-                MoveVehicle(accelerate, brake, turn);
+                MoveVehicle(accelerate, brake, Turn);
             }
             GroundAirbourne();
 
@@ -355,61 +229,6 @@ namespace KartGame.KartSystems
 
             //UpdateDriftVFXOrientation();
         }
-
-        /*
-        void GatherInputs()
-        {
-            CurrentInput = new InputData();
-            WantsToDrift = false;
-
-            if (Input.GetKeyDown(KeyCode.W))
-            {
-                //CurrentInput.Accelerate = true;
-                CurrentInput = new InputData();
-            }
-
-            
-            // reset input
-            CurrentInput = new InputData();
-            WantsToDrift = false;
-
-
-
-            // gather nonzero input from our sources
-            for (int i = 0; i < m_Inputs.Length; i++)
-            {
-                CurrentInput = m_Inputs[i].GenerateInput();
-                WantsToDrift = CurrentInput.Brake && Vector3.Dot(Rigidbody.velocity, transform.forward) > 0.0f;
-            }
-        }*/
-
-        /*
-        void TickPowerups()
-        {
-            // remove all elapsed powerups
-            m_ActivePowerupList.RemoveAll((p) => { return p.ElapsedTime > p.MaxTime; });
-
-            // zero out powerups before we add them all up
-            var powerups = new Stats();
-
-            // add up all our powerups
-            for (int i = 0; i < m_ActivePowerupList.Count; i++)
-            {
-                var p = m_ActivePowerupList[i];
-
-                // add elapsed time
-                p.ElapsedTime += Time.fixedDeltaTime;
-
-                // add up the powerups
-                powerups += p.modifiers;
-            }
-
-            // add powerups to our final stats
-            m_FinalStats = baseStats + powerups;
-
-            // clamp values in finalstats
-            m_FinalStats.Grip = Mathf.Clamp(m_FinalStats.Grip, 0, 1);
-        }*/
 
         void GroundAirbourne()
         {
@@ -641,7 +460,7 @@ namespace KartGame.KartSystems
             }
             else if (validPosition)
             {
-                m_LastValidPosition = transform.position;
+                //m_LastValidPosition = transform.position;
                 m_LastValidRotation.eulerAngles = new Vector3(0.0f, transform.rotation.y, 0.0f);
             }
 

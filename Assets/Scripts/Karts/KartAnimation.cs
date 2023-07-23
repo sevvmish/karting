@@ -53,7 +53,7 @@ namespace KartGame.KartSystems
 
         void FixedUpdate() 
         {
-            m_SmoothedSteeringInput = Mathf.MoveTowards(m_SmoothedSteeringInput, kartController.turn/*kartController.CurrentInput.TurnInput*/, 
+            m_SmoothedSteeringInput = Mathf.MoveTowards(m_SmoothedSteeringInput, kartController.Turn/*kartController.CurrentInput.TurnInput*/, 
                 steeringAnimationDamping * Time.deltaTime);
 
             // Steer front wheels

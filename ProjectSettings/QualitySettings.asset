@@ -153,7 +153,7 @@ QualitySettings:
   - serializedVersion: 3
     name: High
     pixelLightCount: 2
-    shadows: 1
+    shadows: 0
     shadowResolution: 1
     shadowProjection: 1
     shadowCascades: 2
