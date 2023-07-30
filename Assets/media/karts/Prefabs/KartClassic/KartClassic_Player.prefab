@@ -200,6 +200,10 @@ PrefabInstance:
       propertyPath: AirborneReorientationCoefficient
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4895846115232909978, guid: cba6236a3ca88a54081cc989c4f0c08a, type: 3}
+      propertyPath: m_Constraints
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4895846115232909979, guid: cba6236a3ca88a54081cc989c4f0c08a, type: 3}
       propertyPath: m_RootOrder
       value: 0

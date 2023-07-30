@@ -15,6 +15,9 @@ public class GameManager : MonoBehaviour
     private CameraController cameraController;
     private InputController inputController;
 
+    //TODELETE
+    private float _timer;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -39,5 +42,11 @@ public class GameManager : MonoBehaviour
         inputController.SetInputController(joystick, playerTransform.GetComponent<ArcadeKart>());
     }
 
-    
+    private void Update()
+    {
+        _timer += Time.deltaTime;
+        print(_timer.ToString("f0") + " !!!");
+    }
+
+
 }
