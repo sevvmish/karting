@@ -14,6 +14,7 @@ public class CameraController : MonoBehaviour
     private Vector3 cameraRotationShift = new Vector3(20,0,0);
 
     private float _timer;
+    private readonly float timerCooldown = 0.2f;
 
     public void SetCameraController(Camera _camera, Transform _player)
     {
@@ -33,14 +34,14 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        if (_timer > 0.1f)
+        if (_timer > timerCooldown)
         {
             cameraBody.DOMove(playerTransform.position
             + playerTransform.right * cameraPositionShift.x
             + playerTransform.up * cameraPositionShift.y
-            + playerTransform.forward * cameraPositionShift.z, 0.1f);
+            + playerTransform.forward * cameraPositionShift.z, timerCooldown);
 
-            cameraBody.DOLookAt(playerTransform.position + Vector3.up * 1.7f, 0.1f);
+            cameraBody.DOLookAt(playerTransform.position + Vector3.up * 1.7f, timerCooldown);
         }
         else
         {

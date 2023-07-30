@@ -42,11 +42,12 @@ public class GameManager : MonoBehaviour
         inputController.SetInputController(joystick, playerTransform.GetComponent<ArcadeKart>());
     }
 
+    /*
     private void Update()
     {
         _timer += Time.deltaTime;
         print(_timer.ToString("f0") + " !!!");
     }
-
+    */
 
 }
