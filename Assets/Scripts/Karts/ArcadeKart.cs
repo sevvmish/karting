@@ -9,55 +9,52 @@ namespace KartGame.KartSystems
         [System.Serializable]
         public struct Stats
         {
-            [Header("Movement Settings")]
-            [Min(0.001f), Tooltip("Top speed attainable when moving forward.")]
+            //[Header("Movement Settings")]
+            //[Min(0.001f), Tooltip("Top speed attainable when moving forward.")]
             public float TopSpeed;
 
-            [Tooltip("How quickly the kart reaches top speed.")]
+            //[Tooltip("How quickly the kart reaches top speed.")]
             public float Acceleration;
 
-            [Min(0.001f), Tooltip("Top speed attainable when moving backward.")]
+            //[Min(0.001f), Tooltip("Top speed attainable when moving backward.")]
             public float ReverseSpeed;
 
-            [Tooltip("How quickly the kart reaches top speed, when moving backward.")]
+            //[Tooltip("How quickly the kart reaches top speed, when moving backward.")]
             public float ReverseAcceleration;
 
-            [Tooltip("How quickly the kart starts accelerating from 0. A higher number means it accelerates faster sooner.")]
-            [Range(0.2f, 1)]
+            //[Tooltip("How quickly the kart starts accelerating from 0. A higher number means it accelerates faster sooner.")]
+            //[Range(0.2f, 1)]
             public float AccelerationCurve;
 
-            [Tooltip("How quickly the kart slows down when the brake is applied.")]
+            //[Tooltip("How quickly the kart slows down when the brake is applied.")]
             public float Braking;
 
-            [Tooltip("How quickly the kart will reach a full stop when no inputs are made.")]
+            //[Tooltip("How quickly the kart will reach a full stop when no inputs are made.")]
             public float CoastingDrag;
 
-            [Range(0.0f, 1.0f)]
-            [Tooltip("The amount of side-to-side friction.")]
+            //[Range(0.0f, 1.0f)]
+            //[Tooltip("The amount of side-to-side friction.")]
             public float Grip;
 
-            [Tooltip("How tightly the kart can turn left or right.")]
+            //[Tooltip("How tightly the kart can turn left or right.")]
             public float Steer;
 
-            [Tooltip("Additional gravity for when the kart is in the air.")]
+            //[Tooltip("Additional gravity for when the kart is in the air.")]
             public float AddedGravity;
 
-            // allow for stat adding for powerups.
-            public static Stats operator +(Stats a, Stats b)
+            
+            public Stats(float topSpeed, float acceleration, float reverseSpeed, float reverseAcceleration, float accelerationCurve, float braking, float coastingDrag, float grip, float steer, float addedGravity)
             {
-                return new Stats
-                {
-                    Acceleration        = a.Acceleration + b.Acceleration,
-                    AccelerationCurve   = a.AccelerationCurve + b.AccelerationCurve,
-                    Braking             = a.Braking + b.Braking,
-                    CoastingDrag        = a.CoastingDrag + b.CoastingDrag,
-                    AddedGravity        = a.AddedGravity + b.AddedGravity,
-                    Grip                = a.Grip + b.Grip,
-                    ReverseAcceleration = a.ReverseAcceleration + b.ReverseAcceleration,
-                    ReverseSpeed        = a.ReverseSpeed + b.ReverseSpeed,
-                    TopSpeed            = a.TopSpeed + b.TopSpeed,
-                    Steer               = a.Steer + b.Steer,
-                };
+                TopSpeed = topSpeed;
+                Acceleration = acceleration;
+                ReverseSpeed = reverseSpeed;
+                ReverseAcceleration = reverseAcceleration;
+                AccelerationCurve = accelerationCurve;
+                Braking = braking;
+                CoastingDrag = coastingDrag;
+                Grip = grip;
+                Steer = steer;
+                AddedGravity = addedGravity;
             }
         }
 
@@ -65,19 +62,22 @@ namespace KartGame.KartSystems
         public float AirPercent    { get; private set; }
         public float GroundPercent { get; private set; }
 
+        /*
         public ArcadeKart.Stats baseStats = new ArcadeKart.Stats
         {
-            TopSpeed            = 10f,
-            Acceleration        = 5f,
-            AccelerationCurve   = 4f,
+            TopSpeed            = 10f,//10
+            Acceleration        = 5f,//5
+            AccelerationCurve   = 4f,//4
             Braking             = 10f,
             ReverseAcceleration = 5f,
             ReverseSpeed        = 5f,
             Steer               = 5f,
-            CoastingDrag        = 4f,
-            Grip                = .95f,
+            CoastingDrag        = 4f,//4
+            Grip                = .95f, //.95
             AddedGravity        = 1f,
-        };
+        };*/
+
+        public ArcadeKart.Stats baseStats = new Stats(10, 5, 4, 10, 5,5,5,4,0.95f,1);
 
         public bool accelerate;
         public bool brake;
@@ -173,10 +173,17 @@ namespace KartGame.KartSystems
             UpdateSuspensionParams(RearLeftWheel);
             UpdateSuspensionParams(RearRightWheel);
 
-            m_CurrentGrip = baseStats.Grip;
+            m_CurrentGrip = 0.95f;
 
             // add powerups to our final stats
-            m_FinalStats = baseStats;
+            
+
+            //m_FinalStats = baseStats;
+
+            //m_FinalStats.TopSpeed = baseStats.TopSpeed;
+            Stats t = new Stats(30, 3, 4, 3, 3, 3, 3, 0.95f, 2,  1);
+
+            m_FinalStats = t;
         }
             
         
@@ -285,6 +292,8 @@ namespace KartGame.KartSystems
 
         void MoveVehicle(bool accelerate, bool brake, float turnInput)
         {
+            
+
             float accelInput = (accelerate ? 1.0f : 0.0f) - (brake ? 1.0f : 0.0f);
 
             // manual acceleration curve coefficient scalar
@@ -325,6 +334,7 @@ namespace KartGame.KartSystems
             if (wasOverMaxSpeed && !isBraking) 
                 movement *= 0.0f;
 
+
             Vector3 newVelocity = Rigidbody.velocity + movement * Time.fixedDeltaTime;
             newVelocity.y = Rigidbody.velocity.y;
 
@@ -341,6 +351,8 @@ namespace KartGame.KartSystems
             }
 
             Rigidbody.velocity = newVelocity;
+
+            print(Rigidbody.velocity.magnitude.ToString("f0"));
 
             // Drift
             if (GroundPercent > 0.0f)
