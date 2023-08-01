@@ -181,7 +181,7 @@ namespace KartGame.KartSystems
             //m_FinalStats = baseStats;
 
             //m_FinalStats.TopSpeed = baseStats.TopSpeed;
-            Stats t = new Stats(30, 3, 4, 3, 3, 3, 3, 0.95f, 2,  1);
+            Stats t = new Stats(30, 6, 4, 3, 3, 3, 3, 0.95f, 3.2f,  1);
 
             m_FinalStats = t;
         }
