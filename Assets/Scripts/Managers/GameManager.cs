@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using KartGame.KartSystems;
 using TMPro;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 [DefaultExecutionOrder(-100)]
 public class GameManager : MonoBehaviour
@@ -13,13 +15,20 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Joystick joystick;
     [SerializeField] private TextMeshProUGUI timerText;
 
-    private Transform playerTransform;
+    public bool IsRaceStarted { get => isRaceStarted; } 
+
+    //TODEL
+    [SerializeField] private Button restartB;
+
+    public Transform MainPlayerTransform { get; private set; }
     private CameraController cameraController;
     private InputController inputController;
     private ArcadeKart mainArcadeKart;
-
-    //TODELETE
-    private float _timer;
+    
+    private bool isRaceStarted;
+    private readonly float delayBeforeRaceStart = 3f;        
+    private float mainRaceTimer;
+    private float mainGameTimer;
 
     // Start is called before the first frame update
     void Awake()
@@ -35,22 +44,59 @@ public class GameManager : MonoBehaviour
 
         GameObject g = Instantiate(mainCartPrefab);
         g.name = "Main Player";
-        playerTransform = g.transform;
-        playerTransform.position = Vector3.zero;
+        g.AddComponent<MainPlayerDrivingHelper>();
+        MainPlayerTransform = g.transform;
+        MainPlayerTransform.position = Vector3.zero;
         mainArcadeKart = g.GetComponent<ArcadeKart>();
 
         cameraController = GetComponent<CameraController>();
-        cameraController.SetCameraController(GameObject.Find("Main Camera").GetComponent<Camera>(), playerTransform);
+        cameraController.SetCameraController(GameObject.Find("Main Camera").GetComponent<Camera>(), MainPlayerTransform);
 
         inputController = GetComponent<InputController>();
-        inputController.SetInputController(joystick, playerTransform.GetComponent<ArcadeKart>());
+        inputController.SetInputController(joystick, MainPlayerTransform.GetComponent<ArcadeKart>());
+
+        restartB.onClick.AddListener(() => { SceneManager.LoadScene("tests"); });
+
+        //bot
+        GameObject b = Instantiate(mainCartPrefab, new Vector3(1.5f, 0, 2), Quaternion.identity);
+        b.name = "bot1";        
+        b.transform.position = new Vector3(1.5f,0,2);
+        b.AddComponent<BotController>();
+
+        b = Instantiate(mainCartPrefab, new Vector3(-1.5f, 0, 2), Quaternion.identity);
+        b.name = "bot2";
+        b.transform.position = new Vector3(-1.5f, 0, 2);
+        b.AddComponent<BotController>();
+
+        b = Instantiate(mainCartPrefab, new Vector3(2.5f, 0, -2), Quaternion.identity);
+        b.name = "bot3";
+        b.transform.position = new Vector3(2.5f, 0, -2);
+        b.AddComponent<BotController>();
+
+        b = Instantiate(mainCartPrefab, new Vector3(-2.5f, 0, -2), Quaternion.identity);
+        b.name = "bot4";
+        b.transform.position = new Vector3(-2.5f, 0, -2);
+        b.AddComponent<BotController>();
     }
 
     
     private void Update()
     {
-        _timer += Time.deltaTime;
-        timerText.text = _timer.ToString("f0") + " = " + mainArcadeKart.LocalSpeed().ToString("f0");
+        mainGameTimer += Time.deltaTime;
+
+        if (!isRaceStarted)
+        {
+            if (mainGameTimer >= delayBeforeRaceStart)
+            {
+                isRaceStarted = true;
+            }
+        }
+        else
+        {
+            mainRaceTimer += Time.deltaTime;
+        }
+
+        
     }
     
 

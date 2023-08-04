@@ -23,11 +23,11 @@ public class controller : MonoBehaviour
         {
             if (joystick.Direction.y > 0f)
             {
-                kart.accelerate = true;
+                //kart.accelerate = false;
             }
             else
             {
-                kart.accelerate = false;
+                //kart.accelerate = false;
             }
 
             if (joystick.Direction.y < 0f)

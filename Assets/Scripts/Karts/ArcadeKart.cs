@@ -1,62 +1,13 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace KartGame.KartSystems
 {
     public class ArcadeKart : MonoBehaviour
     {        
-        [System.Serializable]
-        public struct Stats
-        {
-            //[Header("Movement Settings")]
-            //[Min(0.001f), Tooltip("Top speed attainable when moving forward.")]
-            public float TopSpeed;
-
-            //[Tooltip("How quickly the kart reaches top speed.")]
-            public float Acceleration;
-
-            //[Min(0.001f), Tooltip("Top speed attainable when moving backward.")]
-            public float ReverseSpeed;
-
-            //[Tooltip("How quickly the kart reaches top speed, when moving backward.")]
-            public float ReverseAcceleration;
-
-            //[Tooltip("How quickly the kart starts accelerating from 0. A higher number means it accelerates faster sooner.")]
-            //[Range(0.2f, 1)]
-            public float AccelerationCurve;
-
-            //[Tooltip("How quickly the kart slows down when the brake is applied.")]
-            public float Braking;
-
-            //[Tooltip("How quickly the kart will reach a full stop when no inputs are made.")]
-            public float CoastingDrag;
-
-            //[Range(0.0f, 1.0f)]
-            //[Tooltip("The amount of side-to-side friction.")]
-            public float Grip;
-
-            //[Tooltip("How tightly the kart can turn left or right.")]
-            public float Steer;
-
-            //[Tooltip("Additional gravity for when the kart is in the air.")]
-            public float AddedGravity;
-
-            
-            public Stats(float topSpeed, float acceleration, float reverseSpeed, float reverseAcceleration, float accelerationCurve, float braking, float coastingDrag, float grip, float steer, float addedGravity)
-            {
-                TopSpeed = topSpeed;
-                Acceleration = acceleration;
-                ReverseSpeed = reverseSpeed;
-                ReverseAcceleration = reverseAcceleration;
-                AccelerationCurve = accelerationCurve;
-                Braking = braking;
-                CoastingDrag = coastingDrag;
-                Grip = grip;
-                Steer = steer;
-                AddedGravity = addedGravity;
-            }
-        }
+        
 
         public Rigidbody Rigidbody { get; private set; }
         public float AirPercent    { get; private set; }
@@ -77,7 +28,7 @@ namespace KartGame.KartSystems
             AddedGravity        = 1f,
         };*/
 
-        public ArcadeKart.Stats baseStats = new Stats(10, 5, 4, 10, 5,5,5,4,0.95f,1);
+        //public Stats baseStats = new Stats(10, 5, 4, 10, 5,5,5,4,0.95f,1);
 
         public bool accelerate;
         public bool brake;
@@ -143,7 +94,8 @@ namespace KartGame.KartSystems
         
         // can the kart move?
         bool m_CanMove = true;
-        ArcadeKart.Stats m_FinalStats;
+        Stats m_FinalStats;
+
 
         Quaternion m_LastValidRotation;
         Vector3 m_LastCollisionNormal;
@@ -151,6 +103,7 @@ namespace KartGame.KartSystems
         bool m_InAir = false;
 
         //public void AddPowerup(StatPowerup statPowerup) => m_ActivePowerupList.Add(statPowerup);
+        public bool IsWallHelperOn { get; private set; }
         public void SetCanMove(bool move) => m_CanMove = move;
         public float GetMaxSpeed() => Mathf.Max(m_FinalStats.TopSpeed, m_FinalStats.ReverseSpeed);
 
@@ -181,19 +134,21 @@ namespace KartGame.KartSystems
             //m_FinalStats = baseStats;
 
             //m_FinalStats.TopSpeed = baseStats.TopSpeed;
-            Stats t = new Stats(30, 6, 4, 3, 3, 3, 3, 0.95f, 3.2f,  1);
+            Stats t = new Stats(30, 5, 4, 3, 2, 3, 3, 0.95f, 3.2f,  1);
 
             m_FinalStats = t;
+            StartCoroutine(cartAccelerate());
         }
             
-        
 
-        private void Update()
+        private IEnumerator cartAccelerate()
         {
-            //accelerate = Input.GetButton("Accelerate");//Input.GetKeyDown(KeyCode.W);
-            //brake = Input.GetButton("Brake");//Input.GetKeyDown(KeyCode.S);
-            //Turn = Input.GetAxis("Horizontal");
+            accelerate = false;
+            yield return new WaitForSeconds(3);
+
+            //accelerate = true;
         }
+        
 
         void FixedUpdate()
         {
@@ -277,6 +232,23 @@ namespace KartGame.KartSystems
         void OnCollisionEnter(Collision collision) => m_HasCollision = true;
         void OnCollisionExit(Collision collision) => m_HasCollision = false;
 
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.layer == 6)
+            {
+                IsWallHelperOn = true;
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (other.gameObject.layer == 6)
+            {
+                IsWallHelperOn = false;
+            }
+        }
+
+        /*
         void OnCollisionStay(Collision collision)
         {
             m_HasCollision = true;
@@ -288,7 +260,7 @@ namespace KartGame.KartSystems
                 if (Vector3.Dot(contact.normal, Vector3.up) > dot)
                     m_LastCollisionNormal = contact.normal;
             }
-        }
+        }*/
 
         void MoveVehicle(bool accelerate, bool brake, float turnInput)
         {
@@ -352,7 +324,7 @@ namespace KartGame.KartSystems
 
             Rigidbody.velocity = newVelocity;
 
-            print(Rigidbody.velocity.magnitude.ToString("f0"));
+            //if (gameObject.name == "Main Player") print(Rigidbody.velocity.magnitude.ToString("f0"));
 
             // Drift
             if (GroundPercent > 0.0f)
@@ -477,6 +449,58 @@ namespace KartGame.KartSystems
             }
 
             //ActivateDriftVFX(IsDrifting && GroundPercent > 0.0f);
+        }
+    }
+
+    
+    public struct Stats
+    {
+        //[Header("Movement Settings")]
+        //[Min(0.001f), Tooltip("Top speed attainable when moving forward.")]
+        public float TopSpeed;
+
+        //[Tooltip("How quickly the kart reaches top speed.")]
+        public float Acceleration;
+
+        //[Min(0.001f), Tooltip("Top speed attainable when moving backward.")]
+        public float ReverseSpeed;
+
+        //[Tooltip("How quickly the kart reaches top speed, when moving backward.")]
+        public float ReverseAcceleration;
+
+        //[Tooltip("How quickly the kart starts accelerating from 0. A higher number means it accelerates faster sooner.")]
+        //[Range(0.2f, 1)]
+        public float AccelerationCurve;
+
+        //[Tooltip("How quickly the kart slows down when the brake is applied.")]
+        public float Braking;
+
+        //[Tooltip("How quickly the kart will reach a full stop when no inputs are made.")]
+        public float CoastingDrag;
+
+        //[Range(0.0f, 1.0f)]
+        //[Tooltip("The amount of side-to-side friction.")]
+        public float Grip;
+
+        //[Tooltip("How tightly the kart can turn left or right.")]
+        public float Steer;
+
+        //[Tooltip("Additional gravity for when the kart is in the air.")]
+        public float AddedGravity;
+
+
+        public Stats(float topSpeed, float acceleration, float reverseSpeed, float reverseAcceleration, float accelerationCurve, float braking, float coastingDrag, float grip, float steer, float addedGravity)
+        {
+            TopSpeed = topSpeed;
+            Acceleration = acceleration;
+            ReverseSpeed = reverseSpeed;
+            ReverseAcceleration = reverseAcceleration;
+            AccelerationCurve = accelerationCurve;
+            Braking = braking;
+            CoastingDrag = coastingDrag;
+            Grip = grip;
+            Steer = steer;
+            AddedGravity = addedGravity;
         }
     }
 }
