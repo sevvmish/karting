@@ -28,12 +28,12 @@ public class InputController : MonoBehaviour
                 //kart.accelerate = false;
             }
 
-            if (joystick.Direction.y < -0.5f)
+            if (joystick.Direction.y < -0.8f)
             {
                 kart.brake = true;
                 kart.accelerate = false;
             }
-            else if (joystick.Direction.y >= 0.5f)
+            else if (joystick.Direction.y >= 0.8f)
             {
                 kart.brake = false;
             }

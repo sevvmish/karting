@@ -12,10 +12,9 @@ public class CameraController : MonoBehaviour
     private Transform playerTransform;
     private Vector3 cameraPositionShift = new Vector3(0,3,-4);
     private Vector3 cameraRotationShift = new Vector3(20,0,0);
-
-    private float _timer;
+        
     private readonly float timerCooldown = 0.2f;
-
+    
     public void SetCameraController(Camera _camera, Transform _player)
     {
         mainCamera = _camera;
@@ -32,32 +31,14 @@ public class CameraController : MonoBehaviour
         cameraBody.position = cameraPositionShift + _player.position;
     }
 
+    
     private void Update()
     {
-        if (_timer > timerCooldown)
-        {
-            cameraBody.DOMove(playerTransform.position
-            + playerTransform.right * cameraPositionShift.x
-            + playerTransform.up * cameraPositionShift.y
-            + playerTransform.forward * cameraPositionShift.z, timerCooldown);
+        cameraBody.DOMove(playerTransform.position
+             + playerTransform.right * cameraPositionShift.x
+             + playerTransform.up * cameraPositionShift.y
+             + playerTransform.forward * cameraPositionShift.z, timerCooldown);
 
-            cameraBody.DOLookAt(playerTransform.position + Vector3.up * 1.7f, timerCooldown);
-        }
-        else
-        {
-            _timer += Time.deltaTime;
-        }
-
-        //cameraBody.position = cameraPositionShift + playerTransform.position;
-
-        /*
-        cameraBody.position = playerTransform.position
-            + playerTransform.right * cameraPositionShift.x
-            + playerTransform.up * cameraPositionShift.y
-            + playerTransform.forward * cameraPositionShift.z;            
-
-        cameraBody.LookAt(playerTransform);
-        cameraBody.localEulerAngles = new Vector3(cameraRotationShift.x, cameraBody.localEulerAngles.y, 0);
-        */
+        cameraBody.DOLookAt(playerTransform.position + Vector3.up * 1.7f, timerCooldown);
     }
 }

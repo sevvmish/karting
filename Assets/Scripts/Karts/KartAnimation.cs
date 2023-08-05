@@ -68,7 +68,7 @@ namespace KartGame.KartSystems
             UpdateWheelFromCollider(rearLeftWheel);
             UpdateWheelFromCollider(rearRightWheel);
         }
-
+        /*
         void LateUpdate()
         {
             // Update position and rotation from WheelCollider
@@ -76,7 +76,7 @@ namespace KartGame.KartSystems
             UpdateWheelFromCollider(frontRightWheel);
             UpdateWheelFromCollider(rearLeftWheel);
             UpdateWheelFromCollider(rearRightWheel);
-        }
+        }*/
 
         void UpdateWheelFromCollider(Wheel wheel)
         {
