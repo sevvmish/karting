@@ -26,27 +26,25 @@ public class MainPlayerDrivingHelper : MonoBehaviour
     }
 
     private void Update()
-    {        
-        if (_timer > updateDataTime)
+    {
+        checkKartStuck();
+    }
+
+    private void checkKartStuck()
+    {
+        if (nextPoint == null) return;
+
+        float angle = Vector3.Angle(kart.transform.forward, (nextPoint.position - kart.transform.position));
+
+        if (angle > 85 && (lastPosition - kart.transform.position).magnitude < 0.1f && kart.IsWallHelperOn)
         {
-            float angle = Vector3.Angle(kart.transform.forward, (nextPoint.position - kart.transform.position));
+            //print(gameObject.name + ": USEDUNSTUCK  on main = angle - " + angle);
 
-            if (angle > 85 && (lastPosition - kart.transform.position).magnitude < 0.1f && kart.IsWallHelperOn)
-            {
-                //print(gameObject.name + ": USEDUNSTUCK  on main = angle - " + angle);
-
-                //kart.transform.DOLookAt(nextPoint.position, 0.3f);
-                kart.transform.DOLookAt(new Vector3(nextPoint.position.x, kart.transform.position.y, nextPoint.position.z), 0.3f);
-                _rigidbody.velocity = Vector3.zero;
-            }
-
-            lastPosition = kart.transform.position;
-
-        }
-        else
-        {
-            _timer += Time.deltaTime;
+            //kart.transform.DOLookAt(nextPoint.position, 0.3f);
+            kart.transform.DOLookAt(new Vector3(nextPoint.position.x, kart.transform.position.y, nextPoint.position.z), 0.3f);
+            _rigidbody.velocity = Vector3.zero;
         }
 
+        lastPosition = kart.transform.position;
     }
 }
