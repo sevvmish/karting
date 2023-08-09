@@ -1764,8 +1764,20 @@ PrefabInstance:
       value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 4895846115356922127, guid: cba6236a3ca88a54081cc989c4f0c08a, type: 3}
+      propertyPath: m_Height
+      value: 2.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 4895846115356922127, guid: cba6236a3ca88a54081cc989c4f0c08a, type: 3}
+      propertyPath: m_Radius
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4895846115356922127, guid: cba6236a3ca88a54081cc989c4f0c08a, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4895846115356922127, guid: cba6236a3ca88a54081cc989c4f0c08a, type: 3}
+      propertyPath: m_Center.z
+      value: 0.21
       objectReference: {fileID: 0}
     - target: {fileID: 4895846115356922127, guid: cba6236a3ca88a54081cc989c4f0c08a, type: 3}
       propertyPath: m_Material
@@ -1880,7 +1892,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 0.9, y: 0.9, z: 2}
   m_Center: {x: 0, y: 0, z: 0}

@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
 
     //TODEL
     [SerializeField] private Button restartB;
+    private float _timerForUpdate;
 
     public Transform MainPlayerTransform { get; private set; }
     private CameraController cameraController;
@@ -83,6 +84,18 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         mainGameTimer += Time.deltaTime;
+
+        if (_timerForUpdate > 1)
+        {
+            _timerForUpdate = 0;
+            timerText.text = mainRaceTimer.ToString("f0");
+        }
+        else
+        {
+            _timerForUpdate += Time.deltaTime;
+        }
+
+        
 
         if (!isRaceStarted)
         {

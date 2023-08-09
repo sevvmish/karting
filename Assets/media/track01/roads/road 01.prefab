@@ -234,7 +234,7 @@ GameObject:
   - component: {fileID: 5775870403543182977}
   - component: {fileID: 758371446790772065}
   m_Layer: 0
-  m_Name: Quad
+  m_Name: road
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

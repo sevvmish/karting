@@ -25,11 +25,11 @@ namespace PathCreation.Examples {
                 while (dst < path.length) {
                     Vector3 point = path.GetPointAtDistance (dst);
                     Quaternion rot = path.GetRotationAtDistance (dst);
-                    //Instantiate (prefab, point, rot, holder.transform);
+                    Instantiate (prefab, point, rot, holder.transform);
                     
-                    GameObject g =  UnityEditor.PrefabUtility.InstantiatePrefab(prefab, holder.transform) as GameObject;
-                    g.transform.position = point;
-                    g.transform.rotation = rot;
+                    //GameObject g =  UnityEditor.PrefabUtility.InstantiatePrefab(prefab, holder.transform) as GameObject;
+                    //g.transform.position = point;
+                    //g.transform.rotation = rot;
                     dst += spacing;
                 }
             }
