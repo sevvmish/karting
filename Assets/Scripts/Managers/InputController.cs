@@ -3,47 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using KartGame.KartSystems;
 using System;
-using DG.Tweening;
 
 public class InputController : MonoBehaviour
 {
     private Joystick joystick;
-    private Transform playerTransform;
-    private int order = 0;
+    private ArcadeKart kart;
 
-    private bool accelerateToSend;
-    private bool breakToSend;
-    private float turnToSend;
-
-    public void SetInputController(Joystick _joystick, Transform playerTransfor)
+    public void SetInputController(Joystick _joystick, ArcadeKart _kart)
     {
-        this.playerTransform = playerTransfor;
         joystick = _joystick;
-    }
-
-    public StandartPacket GetMainPacket()
-    {        
-        StandartPacket p = new StandartPacket(Globals.NetworkID, order, Globals.SecretID, accelerateToSend, breakToSend, turnToSend,
-            playerTransform.position.x, playerTransform.position.y, playerTransform.position.z);
-        order++;
-        turnToSend = 0;
-        accelerateToSend = false;
-        breakToSend = false;
-        return p;
+        kart = _kart;
     }
 
     void Update()
     {
-        //Packet = new StandartPacket(Globals.NetworkID, order, Globals.SecretID, true, false, 0);
-        //order++;
-        accelerateToSend = true;
-
-        if (Globals.Approved && joystick.Direction.magnitude > 0f)
+        if (joystick.Direction.magnitude > 0f)
         {
             if (joystick.Direction.y > 0f)
             {
-                //Packet.Accelerate = true;
-                accelerateToSend = true;
+                kart.accelerate = true;
             }
             else if (joystick.Direction.y <= 0f)
             {
@@ -52,39 +30,34 @@ public class InputController : MonoBehaviour
 
             if (joystick.Direction.y < -0.8f)
             {
-                //Packet.Brake = true;
-                //Packet.Accelerate = false;
-                breakToSend = true;
-                accelerateToSend = false;
+                kart.brake = true;
+                kart.accelerate = false;
             }
             else if (joystick.Direction.y >= 0.8f)
             {
-                //Packet.Brake = false;
-                breakToSend = false;
+                kart.brake = false;
             }
 
             if (Math.Abs(joystick.Direction.x) > 0.1f)
             {
-                //Packet.Turn = joystick.Direction.x;
-                turnToSend += joystick.Direction.x;
+                kart.Turn = joystick.Direction.x;
             }
             else
             {
-                //Packet.Turn = 0;
+                kart.Turn = 0;
             }
             
         }
         else
         {
             //kart.accelerate = false;
-            //Packet.Brake = false;
-            //Packet.Turn = 0;
-            //breakToSend = false;
+            kart.brake = false;
+            kart.Turn = 0;
         }
 
         if (!GameManager.Instance.IsRaceStarted)
         {
-            accelerateToSend = false;
+            kart.accelerate = false;
         }
     }
 }

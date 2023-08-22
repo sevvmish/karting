@@ -14,8 +14,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject mainCartPrefab;
     [SerializeField] private Joystick joystick;
     [SerializeField] private TextMeshProUGUI timerText;
-    [SerializeField] private TextMeshProUGUI packetText;
-
 
     public bool IsRaceStarted { get => isRaceStarted; } 
 
@@ -26,8 +24,6 @@ public class GameManager : MonoBehaviour
     public Transform MainPlayerTransform { get; private set; }
     private CameraController cameraController;
     private InputController inputController;
-    private WebsocketConnection connection;
-    private PlayersUpdate playersUpdate;
     private ArcadeKart mainArcadeKart;
     
     private bool isRaceStarted;
@@ -38,8 +34,6 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        //Application.runInBackground = true;
-
         if (Instance != null && Instance != this)
         {
             Destroy(this);
@@ -60,19 +54,10 @@ public class GameManager : MonoBehaviour
         cameraController.SetCameraController(GameObject.Find("Main Camera").GetComponent<Camera>(), MainPlayerTransform);
 
         inputController = GetComponent<InputController>();
-        inputController.SetInputController(joystick, MainPlayerTransform);
+        inputController.SetInputController(joystick, MainPlayerTransform.GetComponent<ArcadeKart>());
 
         restartB.onClick.AddListener(() => { SceneManager.LoadScene("tests"); });
 
-        Globals.NetworkID = UnityEngine.Random.Range(-9999999, 9999999);
-        playersUpdate = GetComponent<PlayersUpdate>();
-        playersUpdate.SetData(mainArcadeKart);
-                
-        print("network id is set to " + Globals.NetworkID);
-        connection = GetComponent<WebsocketConnection>();
-        connection.StartConnection(mainArcadeKart, packetText, playersUpdate, inputController);
-
-        /*
         //bot
         GameObject b = Instantiate(mainCartPrefab, new Vector3(1.5f, 0, 2), Quaternion.identity);
         b.name = "bot1";        
@@ -93,7 +78,6 @@ public class GameManager : MonoBehaviour
         b.name = "bot4";
         b.transform.position = new Vector3(-2.5f, 0, -2);
         b.AddComponent<BotController>();
-        */
     }
 
     
